@@ -2,6 +2,9 @@ const { Plugin } = require('powercord/entities');
 const { inject, uninject } = require('powercord/injector');
 const { FluxDispatcher: Dispatcher, getModule } = require('powercord/webpack');
 const Settings = require('./components/Settings');
+const { getCurrentUser, getUser } = getModule(['getCurrentUser', 'getUser'], false);
+const { getGuilds } = getModule(['getGuilds'], false);
+const { getChannels } = getModule(['getChannels'], false);
 
 module.exports = class RelationshipsNotifier extends Plugin {
    async startPlugin() {
@@ -11,12 +14,8 @@ module.exports = class RelationshipsNotifier extends Plugin {
          render: Settings
       });
 
-      this.userStore = await getModule(['getCurrentUser', 'getUser']);
-      this.guildStore = await getModule(['getGuild', 'getGuilds']);
-      this.channelStore = await getModule(['getChannel', 'getChannels']);
-
-      this.cachedGroups = [...Object.values(this.channelStore.getChannels())].filter((c) => c.type === 3);
-      this.cachedGuilds = [...Object.values(this.guildStore.getGuilds())];
+      this.cachedGroups = [...Object.values(getChannels())].filter((c) => c.type === 3);
+      this.cachedGuilds = [...Object.values(getGuilds())];
 
       Dispatcher.subscribe('RELATIONSHIP_REMOVE', this.relationshipRemove);
       Dispatcher.subscribe('GUILD_MEMBER_REMOVE', this.memberRemove);
@@ -108,7 +107,7 @@ module.exports = class RelationshipsNotifier extends Plugin {
    };
 
    ban = (data) => {
-      if (data.user.id !== this.userStore.getCurrentUser().id) return;
+      if (data.user.id !== getCurrentUser().id) return;
       let guild = this.cachedGuilds.find((g) => g.id == data.guildId);
       if (!guild || guild === null) return;
       this.removeGuildFromCache(guild.id);
@@ -135,7 +134,7 @@ module.exports = class RelationshipsNotifier extends Plugin {
          this.mostRecentlyRemovedID = null;
          return;
       }
-      let user = this.userStore.getUser(data.relationship.id);
+      let user = getUser(data.relationship.id);
       if (!user || user === null) return;
       if (this.settings.get('remove', true)) {
          powercord.api.notices.sendToast(`rn_${this.random(20)}`, {
@@ -160,7 +159,7 @@ module.exports = class RelationshipsNotifier extends Plugin {
          this.mostRecentlyLeftGuild = null;
          return;
       }
-      if (data.user.id !== this.userStore.getCurrentUser().id) return;
+      if (data.user.id !== getCurrentUser().id) return;
       let guild = this.cachedGuilds.find((g) => g.id == data.guildId);
       if (!guild || guild === null) return;
       this.removeGuildFromCache(guild.id);
@@ -199,10 +198,10 @@ module.exports = class RelationshipsNotifier extends Plugin {
       } else if (type === 'button' && !object.type) {
          return text.replace('%name', object.username ? object.username : object.name);
       } else if (type === 'group') {
-         let name = object.name.length === 0 ? object.recipients.map((id) => this.userStore.getUser(id).username).join(', ') : object.name;
+         let name = object.name.length === 0 ? object.recipients.map((id) => getUser(id).username).join(', ') : object.name;
          return text.replace('%groupname', name).replace('%groupid', object.id);
       } else {
-         let name = object.name.length === 0 ? object.recipients.map((id) => this.userStore.getUser(id).username).join(', ') : object.name;
+         let name = object.name.length === 0 ? object.recipients.map((id) => getUser(id).username).join(', ') : object.name;
          return text.replace('%name', name);
       }
    }
