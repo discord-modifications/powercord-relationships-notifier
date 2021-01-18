@@ -19,6 +19,3 @@ A powercord plugin that notifies you when someone removes you from their friends
 <img src="https://i.imgur.com/l8vH1TX.png"/>
 <img src="https://i.imgur.com/AOLOpn4.png"/>
 <img src="https://i.imgur.com/SKDP0y8.png"/>
-
-# Support
-- eternal#1000
