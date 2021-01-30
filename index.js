@@ -81,7 +81,7 @@ module.exports = class RelationshipsNotifier extends Plugin {
          this.fireToast('group', channel, {
             title: "You've been kicked from a group",
             text: 'Group Name: %groupname'
-         })
+         });
       }
    };
 
@@ -106,7 +106,7 @@ module.exports = class RelationshipsNotifier extends Plugin {
          this.fireToast('ban', guild, {
             title: "You've been banned",
             text: 'Server Name: %servername'
-         })
+         });
       }
    };
 
@@ -122,7 +122,7 @@ module.exports = class RelationshipsNotifier extends Plugin {
          this.fireToast('remove', user, {
             title: 'Someone removed you',
             text: 'Tag: %username#%usertag'
-         })
+         });
       }
       this.mostRecentlyRemovedID = null;
    };
@@ -140,7 +140,7 @@ module.exports = class RelationshipsNotifier extends Plugin {
          this.fireToast('kick', guild, {
             title: "You've been kicked",
             text: 'Server Name: %servername'
-         })
+         });
       }
       this.mostRecentlyLeftGuild = null;
    };
