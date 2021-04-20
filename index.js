@@ -111,18 +111,30 @@ module.exports = class RelationshipsNotifier extends Plugin {
    };
 
    relationshipRemove = (data) => {
-      if (data.relationship.type === 3 || data.relationship.type === 4) return;
+      if (data.relationship.type === 4) return;
       if (this.mostRecentlyRemovedID === data.relationship.id) {
          this.mostRecentlyRemovedID = null;
          return;
       }
       let user = getUser(data.relationship.id);
       if (!user || user === null) return;
-      if (this.settings.get('remove', true)) {
-         this.fireToast('remove', user, {
-            title: 'Someone removed you',
-            text: 'Tag: %username#%usertag'
-         });
+      switch (data.relationship.type) {
+         case 1:
+            if (this.settings.get('remove', true)) {
+               this.fireToast('remove', user, {
+                  title: 'Someone removed you',
+                  text: 'Tag: %username#%usertag'
+               });
+            }
+            break;
+         case 3:
+            if (this.settings.get('friendCancel', true)) {
+               this.fireToast('friendCancel', user, {
+                  title: 'Friend request cancelled',
+                  text: 'Tag: %username#%usertag'
+               });
+            }
+            break;
       }
       this.mostRecentlyRemovedID = null;
    };
@@ -171,7 +183,7 @@ module.exports = class RelationshipsNotifier extends Plugin {
    }
 
    replaceWithVars(type, text, object) {
-      if (type === 'remove') {
+      if (type === 'remove' || type === 'friendCancel') {
          return text.replace('%username', object.username).replace('%usertag', object.discriminator).replace('%userid', object.id);
       } else if (['ban', 'kick'].includes(type)) {
          return text.replace('%servername', object.name).replace('%serverid', object.id);

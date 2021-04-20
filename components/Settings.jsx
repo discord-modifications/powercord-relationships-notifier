@@ -43,6 +43,13 @@ module.exports = class Settings extends React.Component {
             >
                Group
             </SwitchItem>
+            <SwitchItem
+               note={'Display notifications when someone cancells their friend request.'}
+               value={getSetting('friendCancel', true)}
+               onChange={() => toggleSetting('friendCancel')}
+            >
+               Cancelled Friend Request
+            </SwitchItem>
             <Category
                name={'Text'}
                description={'Customize the notifications the way you want.'}
@@ -51,7 +58,7 @@ module.exports = class Settings extends React.Component {
             >
                <Flex style={{ justifyContent: 'center' }}>
                   <div className={FlexChild}>
-                     <FormTitle>Remove Variables</FormTitle>
+                     <FormTitle>Remove & Cancel Variables</FormTitle>
                      <FormText style={{ textAlign: 'center' }}>
                         %username
                         <br></br>
@@ -95,6 +102,20 @@ module.exports = class Settings extends React.Component {
                   note={'The text the notification will have when someone removes you.'}
                >
                   Removed Text
+               </TextInput>
+               <TextInput
+                  value={getSetting('friendCancelTitle', 'Friend request cancelled')}
+                  onChange={(v) => updateSetting('friendCancelTitle', v)}
+                  note={'The title the notification will have when someone cancells their friend request.'}
+               >
+                  Cancelled Friend Request Title
+               </TextInput>
+               <TextInput
+                  value={getSetting('friendCancelText', 'Tag: %username#%usertag')}
+                  onChange={(v) => updateSetting('friendCancelText', v)}
+                  note={'The text the notification will have when someone cancells their friend request.'}
+               >
+                  Cancelled Friend Request Text
                </TextInput>
                <TextInput
                   value={getSetting('kickTitle', "You've been kicked")}
