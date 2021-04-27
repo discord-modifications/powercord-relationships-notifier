@@ -27,14 +27,7 @@ module.exports = class Settings extends React.Component {
                value={getSetting('kick', true)}
                onChange={() => toggleSetting('kick')}
             >
-               Kick
-            </SwitchItem>
-            <SwitchItem
-               note={'Display notifications when you get banned from a server.'}
-               value={getSetting('ban', true)}
-               onChange={() => toggleSetting('ban')}
-            >
-               Ban
+               Kick/Ban
             </SwitchItem>
             <SwitchItem
                note={'Display notifications when you get kicked from a group chat.'}
@@ -76,10 +69,6 @@ module.exports = class Settings extends React.Component {
                      </FormText>
                   </div>
                   <div className={FlexChild}>
-                     <FormTitle>Button Variables</FormTitle>
-                     <FormText style={{ textAlign: 'center' }}>%name</FormText>
-                  </div>
-                  <div className={FlexChild}>
                      <FormTitle>Group Variables</FormTitle>
                      <FormText style={{ textAlign: 'center' }}>
                         %groupname
@@ -90,81 +79,32 @@ module.exports = class Settings extends React.Component {
                </Flex>
                <br></br>
                <TextInput
-                  value={getSetting('removeTitle', 'Someone removed you')}
-                  onChange={(v) => updateSetting('removeTitle', v)}
-                  note={'The title the notification will have when someone removes you.'}
-               >
-                  Removed Title
-               </TextInput>
-               <TextInput
-                  value={getSetting('removeText', 'Tag: %username#%usertag')}
+                  value={getSetting('removeText', '%username#%usertag removed you as a friend.')}
                   onChange={(v) => updateSetting('removeText', v)}
                   note={'The text the notification will have when someone removes you.'}
                >
                   Removed Text
                </TextInput>
                <TextInput
-                  value={getSetting('friendCancelTitle', 'Friend request cancelled')}
-                  onChange={(v) => updateSetting('friendCancelTitle', v)}
-                  note={'The title the notification will have when someone cancells their friend request.'}
-               >
-                  Cancelled Friend Request Title
-               </TextInput>
-               <TextInput
-                  value={getSetting('friendCancelText', 'Tag: %username#%usertag')}
+                  value={getSetting('friendCancelText', '%username#%usertag cancelled their friend request.')}
                   onChange={(v) => updateSetting('friendCancelText', v)}
                   note={'The text the notification will have when someone cancells their friend request.'}
                >
                   Cancelled Friend Request Text
                </TextInput>
                <TextInput
-                  value={getSetting('kickTitle', "You've been kicked")}
-                  onChange={(v) => updateSetting('kickTitle', v)}
-                  note={'The title the notification will have when you get kicked from a server.'}
-               >
-                  Kicked Title
-               </TextInput>
-               <TextInput
-                  value={getSetting('kickText', 'Server Name: %servername')}
+                  value={getSetting('kickText', "You've been kicked/Banned from %servername")}
                   onChange={(v) => updateSetting('kickText', v)}
-                  note={'The text the notification will have when you get kicked from a server.'}
+                  note={'The text the notification will have when you get kicked/banned from a server.'}
                >
-                  Kicked Text
+                  Kicked/Banned Text
                </TextInput>
                <TextInput
-                  value={getSetting('banTitle', "You've been banned")}
-                  onChange={(v) => updateSetting('banTitle', v)}
-                  note={'The title the notification will have when you get banned from a server.'}
-               >
-                  Banned Title
-               </TextInput>
-               <TextInput
-                  value={getSetting('banText', 'Server Name: %servername')}
-                  onChange={(v) => updateSetting('banText', v)}
-                  note={'The text the notification will have when you get banned from a server.'}
-               >
-                  Banned Text
-               </TextInput>
-               <TextInput
-                  value={getSetting('groupTitle', "You've been kicked from a group")}
-                  onChange={(v) => updateSetting('groupTitle', v)}
-                  note={'The title the notification will have when you get kicked from a group chat.'}
-               >
-                  Group Title
-               </TextInput>
-               <TextInput
-                  value={getSetting('groupText', 'Group Name: %groupname')}
+                  value={getSetting('groupText', "You've been removed from the group %groupname")}
                   onChange={(v) => updateSetting('groupText', v)}
                   note={'The text the notification will have when you get kicked from a group chat.'}
                >
                   Group Text
-               </TextInput>
-               <TextInput
-                  value={getSetting('buttonText', 'Fuck %name')}
-                  onChange={(v) => updateSetting('buttonText', v)}
-                  note={"The text the notification's confirm button will have."}
-               >
-                  Button Text
                </TextInput>
             </Category>
          </div>

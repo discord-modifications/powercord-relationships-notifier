@@ -5,6 +5,7 @@ const Settings = require('./components/Settings');
 const { getCurrentUser, getUser } = getModule(['getCurrentUser', 'getUser'], false);
 const { getGuilds } = getModule(['getGuilds'], false);
 const { getChannels } = getModule(['getChannels'], false);
+const ChannelStore = getModule(['openPrivateChannel'], false);
 
 module.exports = class RelationshipsNotifier extends Plugin {
    async startPlugin() {
@@ -19,7 +20,6 @@ module.exports = class RelationshipsNotifier extends Plugin {
 
       Dispatcher.subscribe('RELATIONSHIP_REMOVE', this.relationshipRemove);
       Dispatcher.subscribe('GUILD_MEMBER_REMOVE', this.memberRemove);
-      Dispatcher.subscribe('GUILD_BAN_ADD', this.ban);
       Dispatcher.subscribe('GUILD_CREATE', this.guildCreate);
       Dispatcher.subscribe('CHANNEL_CREATE', this.channelCreate);
       Dispatcher.subscribe('CHANNEL_DELETE', this.channelDelete);
@@ -57,7 +57,6 @@ module.exports = class RelationshipsNotifier extends Plugin {
       uninject('rn-group-check');
       Dispatcher.unsubscribe('RELATIONSHIP_REMOVE', this.relationshipRemove);
       Dispatcher.unsubscribe('GUILD_MEMBER_REMOVE', this.memberRemove);
-      Dispatcher.unsubscribe('GUILD_BAN_ADD', this.ban);
       Dispatcher.unsubscribe('GUILD_CREATE', this.guildCreate);
       Dispatcher.unsubscribe('CHANNEL_CREATE', this.channelCreate);
       Dispatcher.unsubscribe('CHANNEL_DELETE', this.channelDelete);
@@ -78,10 +77,7 @@ module.exports = class RelationshipsNotifier extends Plugin {
       if (!channel || channel === null) return;
       this.removeGroupFromCache(channel.id);
       if (this.settings.get('group', true)) {
-         this.fireToast('group', channel, {
-            title: "You've been kicked from a group",
-            text: 'Group Name: %groupname'
-         });
+         this.fireToast('group', channel, "You've been removed from the group %groupname");
       }
    };
 
@@ -97,19 +93,6 @@ module.exports = class RelationshipsNotifier extends Plugin {
       this.cachedGuilds.splice(index, 1);
    };
 
-   ban = (data) => {
-      if (data.user.id !== getCurrentUser().id) return;
-      let guild = this.cachedGuilds.find((g) => g.id == data.guildId);
-      if (!guild || guild === null) return;
-      this.removeGuildFromCache(guild.id);
-      if (this.settings.get('ban', true)) {
-         this.fireToast('ban', guild, {
-            title: "You've been banned",
-            text: 'Server Name: %servername'
-         });
-      }
-   };
-
    relationshipRemove = (data) => {
       if (data.relationship.type === 4) return;
       if (this.mostRecentlyRemovedID === data.relationship.id) {
@@ -121,18 +104,12 @@ module.exports = class RelationshipsNotifier extends Plugin {
       switch (data.relationship.type) {
          case 1:
             if (this.settings.get('remove', true)) {
-               this.fireToast('remove', user, {
-                  title: 'Someone removed you',
-                  text: 'Tag: %username#%usertag'
-               });
+               this.fireToast('remove', user, '%username#%usertag removed you as a friend.');
             }
             break;
          case 3:
             if (this.settings.get('friendCancel', true)) {
-               this.fireToast('friendCancel', user, {
-                  title: 'Friend request cancelled',
-                  text: 'Tag: %username#%usertag'
-               });
+               this.fireToast('friendCancel', user, '%username#%usertag cancelled their friend request.');
             }
             break;
       }
@@ -140,6 +117,7 @@ module.exports = class RelationshipsNotifier extends Plugin {
    };
 
    memberRemove = (data) => {
+      console.log(data);
       if (this.mostRecentlyLeftGuild === data.guildId) {
          this.mostRecentlyLeftGuild = null;
          return;
@@ -149,10 +127,7 @@ module.exports = class RelationshipsNotifier extends Plugin {
       if (!guild || guild === null) return;
       this.removeGuildFromCache(guild.id);
       if (this.settings.get('kick', true)) {
-         this.fireToast('kick', guild, {
-            title: "You've been kicked",
-            text: 'Server Name: %servername'
-         });
+         this.fireToast('kick', guild, "You've been kicked/banned from %servername");
       }
       this.mostRecentlyLeftGuild = null;
    };
@@ -167,28 +142,30 @@ module.exports = class RelationshipsNotifier extends Plugin {
    }
 
    fireToast(type, instance, defaults) {
+      let buttons = null;
+
+      if (['friendCancel', 'remove'].includes(type)) buttons = [{
+         text: 'Open DM',
+         color: 'brand',
+         size: 'small',
+         look: 'ghost',
+         onClick: () => {
+            ChannelStore.openPrivateChannel(instance.id);
+         }
+      }];
+
       powercord.api.notices.sendToast(`rn_${this.random(20)}`, {
-         header: this.replaceWithVars(type, this.settings.get(`${type}Title`, defaults.title), instance),
-         content: this.replaceWithVars(type, this.settings.get(`${type}Text`, defaults.text), instance),
+         header: this.replaceWithVars(type, this.settings.get(`${type}Text`, defaults), instance),
          type: 'danger',
-         buttons: [
-            {
-               text: this.replaceWithVars('button', this.settings.get('buttonText', 'Fuck %name'), instance),
-               color: 'red',
-               size: 'small',
-               look: 'outlined'
-            }
-         ]
+         buttons
       });
-   }
+   };
 
    replaceWithVars(type, text, object) {
       if (type === 'remove' || type === 'friendCancel') {
          return text.replace('%username', object.username).replace('%usertag', object.discriminator).replace('%userid', object.id);
-      } else if (['ban', 'kick'].includes(type)) {
+      } else if (type === 'kick') {
          return text.replace('%servername', object.name).replace('%serverid', object.id);
-      } else if (type === 'button' && !object.type) {
-         return text.replace('%name', object.username ? object.username : object.name);
       } else if (type === 'group') {
          let name = object.name.length === 0 ? object.recipients.map((id) => getUser(id).username).join(', ') : object.name;
          return text.replace('%groupname', name).replace('%groupid', object.id);
