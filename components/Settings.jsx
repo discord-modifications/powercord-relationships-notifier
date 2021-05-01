@@ -93,7 +93,7 @@ module.exports = class Settings extends React.Component {
                   Cancelled Friend Request Text
                </TextInput>
                <TextInput
-                  value={getSetting('kickText', "You've been kicked/Banned from %servername")}
+                  value={getSetting('kickText', "You've been kicked/banned from %servername")}
                   onChange={(v) => updateSetting('kickText', v)}
                   note={'The text the notification will have when you get kicked/banned from a server.'}
                >
