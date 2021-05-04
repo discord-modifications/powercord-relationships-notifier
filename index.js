@@ -117,7 +117,6 @@ module.exports = class RelationshipsNotifier extends Plugin {
    };
 
    memberRemove = (data) => {
-      console.log(data);
       if (this.mostRecentlyLeftGuild === data.guildId) {
          this.mostRecentlyLeftGuild = null;
          return;
