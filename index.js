@@ -132,9 +132,9 @@ module.exports = class RelationshipsNotifier extends Plugin {
    };
 
    random() {
-      var result = '';
-      var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-      for (var i = 0; i < length; i++) {
+      let result = '';
+      let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      for (let i = 0; i < characters.length; i++) {
          result += characters.charAt(Math.floor(Math.random() * characters.length));
       }
       return result;
@@ -147,17 +147,40 @@ module.exports = class RelationshipsNotifier extends Plugin {
          text: 'Open DM',
          color: 'brand',
          size: 'small',
-         look: 'ghost',
+         look: 'outlined',
          onClick: () => {
             ChannelStore.openPrivateChannel(instance.id);
          }
       }];
 
-      powercord.api.notices.sendToast(`rn_${this.random(20)}`, {
-         header: this.replaceWithVars(type, this.settings.get(`${type}Text`, defaults), instance),
-         type: 'danger',
-         buttons
-      });
+      let text = this.replaceWithVars(type, this.settings.get(`${type}Text`, defaults), instance);
+
+      if (this.settings.get('appToasts', true)) {
+         if (this.settings.get('appToastsFocus', true) && document.hasFocus()) {
+            powercord.api.notices.sendToast(`rn_${this.random(20)}`, {
+               header: text,
+               type: 'danger',
+               buttons
+            });
+         }
+      }
+
+
+      if (this.settings.get('desktopNotif', true)) {
+         if (!document.hasFocus() || this.settings.get('desktopNotifFocus', false)) {
+            new Notification('Relationships Notifier', {
+               body: text,
+               icon: (instance.icon && `https://cdn.discordapp.com/${instance.type == 3 ?
+                  'channel-icons' :
+                  'icons'
+                  }/${instance.id}/${instance.icon}.${instance.icon.startsWith('a_') ?
+                     'gif' :
+                     'png'
+                  }?size=4096`
+               ) ?? instance.getAvatarURL?.()
+            });
+         }
+      }
    };
 
    replaceWithVars(type, text, object) {

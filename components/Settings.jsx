@@ -15,34 +15,76 @@ module.exports = class Settings extends React.Component {
       const { getSetting, updateSetting, toggleSetting } = this.props;
       return (
          <div>
-            <SwitchItem
-               note={'Display notifications when someone removes you from their friends list.'}
-               value={getSetting('remove', true)}
-               onChange={() => toggleSetting('remove')}
+            <Category
+               name={'Notifications'}
+               description={'Customize notification behaviour.'}
+               opened={getSetting('notificationsExpanded', false)}
+               onChange={() => updateSetting('notificationsExpanded', !getSetting('notificationsExpanded', false))}
             >
-               Remove
-            </SwitchItem>
-            <SwitchItem
-               note={'Display notifications when you get kicked from a server.'}
-               value={getSetting('kick', true)}
-               onChange={() => toggleSetting('kick')}
+               <SwitchItem
+                  note={'Display in-app toasts.'}
+                  value={getSetting('appToasts', true)}
+                  onChange={() => toggleSetting('appToasts')}
+               >
+                  In-App Toasts
+               </SwitchItem>
+               <SwitchItem
+                  note={'Display in-app toasts only when discord is focused.'}
+                  value={getSetting('appToastsFocus', true)}
+                  onChange={() => toggleSetting('appToastsFocus')}
+               >
+                  Focus In-App Toasts
+               </SwitchItem>
+               <SwitchItem
+                  note={'Display desktop notifications.'}
+                  value={getSetting('desktopNotif', true)}
+                  onChange={() => toggleSetting('desktopNotif')}
+               >
+                  Desktop Notifications
+               </SwitchItem>
+               <SwitchItem
+                  note={"Display desktop notifications even when discord is focused."}
+                  value={getSetting('desktopNotifFocus', false)}
+                  onChange={() => toggleSetting('desktopNotifFocus')}
+               >
+                  Focus Notifications
+               </SwitchItem>
+            </Category>
+            <Category
+               name={'Events'}
+               description={'Turn off notifications for individual events.'}
+               opened={getSetting('typesExpanded', false)}
+               onChange={() => updateSetting('typesExpanded', !getSetting('typesExpanded', false))}
             >
-               Kick/Ban
-            </SwitchItem>
-            <SwitchItem
-               note={'Display notifications when you get kicked from a group chat.'}
-               value={getSetting('group', true)}
-               onChange={() => toggleSetting('group')}
-            >
-               Group
-            </SwitchItem>
-            <SwitchItem
-               note={'Display notifications when someone cancells their friend request.'}
-               value={getSetting('friendCancel', true)}
-               onChange={() => toggleSetting('friendCancel')}
-            >
-               Cancelled Friend Request
-            </SwitchItem>
+               <SwitchItem
+                  note={'Display notifications when someone removes you from their friends list.'}
+                  value={getSetting('remove', true)}
+                  onChange={() => toggleSetting('remove')}
+               >
+                  Remove
+               </SwitchItem>
+               <SwitchItem
+                  note={'Display notifications when you get kicked from a server.'}
+                  value={getSetting('kick', true)}
+                  onChange={() => toggleSetting('kick')}
+               >
+                  Kick/Ban
+               </SwitchItem>
+               <SwitchItem
+                  note={'Display notifications when you get kicked from a group chat.'}
+                  value={getSetting('group', true)}
+                  onChange={() => toggleSetting('group')}
+               >
+                  Group
+               </SwitchItem>
+               <SwitchItem
+                  note={'Display notifications when someone cancells their friend request.'}
+                  value={getSetting('friendCancel', true)}
+                  onChange={() => toggleSetting('friendCancel')}
+               >
+                  Cancelled Friend Request
+               </SwitchItem>
+            </Category>
             <Category
                name={'Text'}
                description={'Customize the notifications the way you want.'}
