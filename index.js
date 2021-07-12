@@ -143,15 +143,17 @@ module.exports = class RelationshipsNotifier extends Plugin {
    fireToast(type, instance, defaults) {
       let buttons = null;
 
-      if (['friendCancel', 'remove'].includes(type)) buttons = [{
-         text: 'Open DM',
-         color: 'brand',
-         size: 'small',
-         look: 'outlined',
-         onClick: () => {
-            ChannelStore.openPrivateChannel(instance.id);
-         }
-      }];
+      if (['friendCancel', 'remove'].includes(type)) {
+         buttons = [{
+            text: 'Open DM',
+            color: 'brand',
+            size: 'small',
+            look: 'outlined',
+            onClick: () => {
+               ChannelStore.openPrivateChannel(instance.id);
+            }
+         }];
+      }
 
       let text = this.replaceWithVars(type, this.settings.get(`${type}Text`, defaults), instance);
 
@@ -178,7 +180,11 @@ module.exports = class RelationshipsNotifier extends Plugin {
                      'png'
                   }?size=4096`
                ) ?? instance.getAvatarURL?.()
-            });
+            }).onclick = () => {
+               if (['friendCancel', 'remove'].includes(type)) {
+                  ChannelStore.openPrivateChannel(instance.id);
+               }
+            };
          }
       }
    };
