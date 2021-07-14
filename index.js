@@ -179,14 +179,13 @@ module.exports = class RelationshipsNotifier extends Plugin {
                      'gif' :
                      'png'
                   }?size=4096`
-               ) ?? instance.getAvatarURL?.()
-            }).onclick = () => {
-               if (['friendCancel', 'remove'].includes(type)) {
-                  ChannelStore.openPrivateChannel(instance.id);
-               }
+               ) : instance.getAvatarURL?.()
+            });
+
+            if (['friendCancel', 'remove'].includes(type)) notification.onclick = () => {
                ChannelStore.openPrivateChannel(instance.id);
             };
-         }
+         };
       }
    };
 
