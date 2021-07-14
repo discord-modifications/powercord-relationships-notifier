@@ -170,9 +170,9 @@ module.exports = class RelationshipsNotifier extends Plugin {
 
       if (this.settings.get('desktopNotif', true)) {
          if (!document.hasFocus() || this.settings.get('desktopNotifFocus', false)) {
-            new Notification('Relationships Notifier', {
+            let notification = new Notification('Relationships Notifier', {
                body: text,
-               icon: (instance.icon && `https://cdn.discordapp.com/${instance.type == 3 ?
+               icon: (instance.members || instance.recipients) ? (instance.icon && `https://cdn.discordapp.com/${instance.type == 3 ?
                   'channel-icons' :
                   'icons'
                   }/${instance.id}/${instance.icon}.${instance.icon.startsWith('a_') ?
@@ -184,6 +184,7 @@ module.exports = class RelationshipsNotifier extends Plugin {
                if (['friendCancel', 'remove'].includes(type)) {
                   ChannelStore.openPrivateChannel(instance.id);
                }
+               ChannelStore.openPrivateChannel(instance.id);
             };
          }
       }
