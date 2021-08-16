@@ -3,5 +3,6 @@
    "description": "Notifies you when someone removes you from their friends list, you are banned/kicked from a server or kicked from a group chat.",
    "author": "eternal",
    "version": "1.0.0",
+   "discord": "shnvz5ryAt",
    "license": "Unlicensed"
 }
