@@ -27,9 +27,10 @@ module.exports = class RelationshipsNotifier extends Plugin {
       this.mostRecentlyRemovedID = null;
       this.mostRecentlyLeftGuild = null;
       this.mostRecentlyLeftGroup = null;
+      this.mostRecentlyLurking = null;
 
-      const relationshipModule = await getModule(['removeRelationship']);
-      inject('rn-relationship-check', relationshipModule, 'removeRelationship', (args, res) => {
+      const removeRelationship = await getModule(['removeRelationship']);
+      inject('rn-relationship-check', removeRelationship, 'removeRelationship', (args, res) => {
          this.mostRecentlyRemovedID = args[0];
          return res;
       });
@@ -47,6 +48,12 @@ module.exports = class RelationshipsNotifier extends Plugin {
          this.removeGroupFromCache(args[0]);
          return res;
       });
+
+      const startLurking = await getModule(['startLurking']);
+      inject('rn-lurk-check', startLurking, 'startLurking', ([guild], res) => {
+         this.mostRecentlyLurking = guild;
+         return res;
+      });
    }
 
    pluginWillUnload() {
@@ -55,6 +62,7 @@ module.exports = class RelationshipsNotifier extends Plugin {
       uninject('rn-guild-join-check');
       uninject('rn-guild-leave-check');
       uninject('rn-group-check');
+      uninject('rn-lurk-check');
       Dispatcher.unsubscribe('RELATIONSHIP_REMOVE', this.relationshipRemove);
       Dispatcher.unsubscribe('GUILD_MEMBER_REMOVE', this.memberRemove);
       Dispatcher.unsubscribe('GUILD_CREATE', this.guildCreate);
@@ -63,6 +71,11 @@ module.exports = class RelationshipsNotifier extends Plugin {
    }
 
    guildCreate = (data) => {
+      if (this.mostRecentlyLurking == data.guild.id) {
+         this.mostRecentlyLurking = null;
+         this.removeGroupFromCache(data.guild.id);
+         return;
+      }
       this.cachedGuilds.push(data.guild);
    };
 
