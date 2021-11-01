@@ -173,7 +173,7 @@ module.exports = class RelationshipsNotifier extends Plugin {
       let text = this.replaceWithVars(type, this.settings.get(`${type}Text`, defaults), instance);
 
       if (this.settings.get('appToasts', true)) {
-         if (this.settings.get('appToastsFocus', true) && document.hasFocus()) {
+         if (this.settings.get('appToastsFocus', true) && document.hasFocus() || !this.settings.get('appToastsFocus', true) && !document.hasFocus()) {
             powercord.api.notices.sendToast(`rn_${this.random(20)}`, {
                header: text,
                type: 'danger',
