@@ -4,7 +4,7 @@ const { Plugin } = require('powercord/entities');
 
 const Settings = require('./components/Settings');
 
-const { getCurrentUser, getUser } = getModule(['getNullableCurrentUser', 'getUser'], false);
+const { getCurrentUser, getUser } = getModule(['getCurrentUser', 'getUser'], false);
 const ChannelStore = getModule(['openPrivateChannel'], false);
 const { getChannels } = getModule(['getChannels'], false);
 const { getGuilds } = getModule(['getGuilds'], false);
