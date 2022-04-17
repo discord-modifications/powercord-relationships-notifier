@@ -5,9 +5,9 @@ const { Plugin } = require('powercord/entities');
 const Settings = require('./components/Settings');
 
 const { getCurrentUser, getUser } = getModule(['getCurrentUser', 'getUser'], false);
+const { getGuilds, getGuild } = getModule(['getGuilds'], false);
 const ChannelStore = getModule(['openPrivateChannel'], false);
 const { getChannels } = getModule(['getChannels'], false);
-const { getGuilds } = getModule(['getGuilds'], false);
 
 module.exports = class RelationshipsNotifier extends Plugin {
    async startPlugin() {
@@ -50,12 +50,6 @@ module.exports = class RelationshipsNotifier extends Plugin {
          this.removeGroupFromCache(args[0]);
          return res;
       });
-
-      const startLurking = await getModule(['startLurking']);
-      inject('rn-lurk-check', startLurking, 'startLurking', ([guild], res) => {
-         this.mostRecentlyLurking = guild;
-         return res;
-      });
    }
 
    pluginWillUnload() {
@@ -64,10 +58,10 @@ module.exports = class RelationshipsNotifier extends Plugin {
       uninject('rn-guild-join-check');
       uninject('rn-guild-leave-check');
       uninject('rn-group-check');
-      uninject('rn-lurk-check');
       Dispatcher.unsubscribe('RELATIONSHIP_REMOVE', this.relationshipRemove);
       Dispatcher.unsubscribe('GUILD_MEMBER_REMOVE', this.memberRemove);
       Dispatcher.unsubscribe('GUILD_CREATE', this.guildCreate);
+      Dispatcher.unsubscribe('GUILD_JOIN', this.guildJoin);
       Dispatcher.unsubscribe('CHANNEL_CREATE', this.channelCreate);
       Dispatcher.unsubscribe('CHANNEL_DELETE', this.channelDelete);
    }
@@ -75,10 +69,15 @@ module.exports = class RelationshipsNotifier extends Plugin {
    guildCreate = (data) => {
       if (this.mostRecentlyLurking == data.guild.id) {
          this.mostRecentlyLurking = null;
-         this.removeGroupFromCache(data.guild.id);
+         this.removeGuildFromCache(data.guild.id);
          return;
       }
-      this.cachedGuilds.push(data.guild);
+      this.cachedGuilds.push(getGuild(data.guild.id));
+   };
+
+   guildJoin = (data) => {
+      if (!data.lurking) return;
+      this.mostRecentlyLurking = data.guildId;
    };
 
    channelCreate = (data) => {
