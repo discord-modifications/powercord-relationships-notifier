@@ -23,6 +23,7 @@ module.exports = class RelationshipsNotifier extends Plugin {
       Dispatcher.subscribe('RELATIONSHIP_REMOVE', this.relationshipRemove);
       Dispatcher.subscribe('GUILD_MEMBER_REMOVE', this.memberRemove);
       Dispatcher.subscribe('GUILD_CREATE', this.guildCreate);
+      Dispatcher.subscribe('GUILD_JOIN', this.guildJoin);
       Dispatcher.subscribe('CHANNEL_CREATE', this.channelCreate);
       Dispatcher.subscribe('CHANNEL_DELETE', this.channelDelete);
 
@@ -76,7 +77,7 @@ module.exports = class RelationshipsNotifier extends Plugin {
    };
 
    guildJoin = (data) => {
-      if (!data.lurking) return;
+      if (!data.lurker) return;
       this.mostRecentlyLurking = data.guildId;
    };
 
